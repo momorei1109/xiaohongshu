@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>RED EXTRACTOR | 笔记暗房</title>
+    
+    <!-- 极简 Zev黑体 -->
+    <link href="https://fontsapi.zeoseven.com/2110/main/result.css" onload="this.rel='stylesheet'" rel="preload" as="style" crossorigin />
+    <noscript><link rel="stylesheet" href="https://fontsapi.zeoseven.com/2110/main/result.css" /></noscript>
+    
+    <style>
+        :root {
+            --font-sans: "ZevHeiTC-N Dev", sans-serif;
+            
+            /* Light Theme (Ice & Crimson) */
+            --bg-body: #F4F5F7;
+            --bg-glass: rgba(252, 252, 254, 0.65);
+            --bg-input: rgba(0, 0, 0, 0.03);
+            --bg-input-hover: rgba(0, 0, 0, 0.05);
+            
+            --border-light: rgba(0, 0, 0, 0.06);
+            --border-highlight: rgba(255, 255, 255, 0.9);
+            
+            --text-main: #1C1C1E;
+            --text-sub: #8E8E93;
+            
+            --accent-color: #D9253B; /* 高级绯红 */
+            --accent-text: #FFFFFF;
+            
+            --shadow-drop: 0 12px 36px rgba(0, 0, 0, 0.04);
+            --jelly-inset: inset 0 1px 0 var(--border-highlight), inset 0 -1px 0 rgba(0,0,0,0.02);
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme (Abyss) */
+            --bg-body: #0A0A0C;
+            --bg-glass: rgba(18, 18, 20, 0.5);
+            --bg-input: rgba(255, 255, 255, 0.03);
+            --bg-input-hover: rgba(255, 255, 255, 0.06);
+            
+            --border-light: rgba(255, 255, 255, 0.08);
+            --border-highlight: rgba(255, 255, 255, 0.03);
+            
+            --text-main: #EAEAEA;
+            --text-sub: #636366;
+            
+            --accent-color: #E83A4F;
+            --accent-text: #FFFFFF;
+            
+            --shadow-drop: 0 16px 48px rgba(0, 0, 0, 0.5);
+            --jelly-inset: inset 0 1px 0 var(--border-highlight), inset 0 -1px 0 rgba(0,0,0,0.3);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        body { 
+            font-family: var(--font-sans); 
+            font-size: 11.5px;
+            background: transparent;
+            color: var(--text-main); 
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 16px;
+            line-height: 1.6;
+        }
+
+        .red-container { 
+            width: 100%; 
+            max-width: 400px;
+            background: var(--bg-glass); 
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            border-radius: 20px;
+            box-shadow: var(--shadow-drop), var(--jelly-inset); 
+            overflow: hidden;
+            display: flex; 
+            flex-direction: column; 
+        }
+
+        /* --- 头部区 --- */
+        .red-header { 
+            padding: 24px 20px 20px; 
+            text-align: center; 
+            position: relative; 
+            border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+        }
+        
+        .red-theme-btn { 
+            position: absolute; 
+            top: 16px; right: 16px; 
+            width: 26px; height: 26px;
+            border-radius: 8px;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; color: var(--text-sub);
+            background: var(--bg-input);
+            transition: all 0.3s;
+        }
+        .red-theme-btn:hover { color: var(--text-main); background: var(--bg-input-hover); transform: translateY(-1px); }
+        .red-icon { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+        .red-title { 
+            font-size: 16px; font-weight: bold; letter-spacing: 2px; 
+            margin-bottom: 4px; color: var(--text-main);
+        }
+        .red-subtitle {
+            font-family: "Courier New", monospace;
+            font-size: 9px; color: var(--text-sub);
+            letter-spacing: 1px; text-transform: uppercase;
+        }
+
+        /* --- 解析输入区 --- */
+        .red-body { padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+
+        .red-input-box { display: flex; flex-direction: column; gap: 10px; }
+        .red-label { font-size: 11px; font-weight: bold; color: var(--text-main); display: flex; justify-content: space-between;}
+        .red-api-hint { font-size: 9px; color: var(--text-sub); font-weight: normal; }
+        
+        .red-input { 
+            width: 100%; padding: 12px 14px; 
+            background: var(--bg-input); 
+            border: 1px solid transparent; border-radius: 12px;
+            color: var(--text-main); font-family: var(--font-sans); font-size: 11px; 
+            outline: none; transition: all 0.3s;
+        }
+        .red-input:focus { 
+            background: var(--bg-glass); border-color: var(--accent-color); 
+        }
+        .red-input::placeholder { color: var(--text-sub); }
+
+        .red-submit { 
+            padding: 12px; 
+            font-size: 11px; font-weight: bold; letter-spacing: 2px;
+            font-family: var(--font-sans); cursor: pointer; 
+            border: none; border-radius: 12px;
+            background: var(--text-main); color: var(--bg-body); 
+            text-transform: uppercase; transition: all 0.3s;
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+        .red-submit:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+        .red-submit:active { transform: translateY(0) scale(0.98); }
+        .red-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        /* --- 结果输出区 --- */
+        .red-result { display: none; flex-direction: column; gap: 20px; border-top: 1px dashed rgba(128, 128, 128, 0.2); padding-top: 20px; animation: fadeIn 0.4s ease; }
+        .red-result.show { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;}
+        .red-btn-small { 
+            background: var(--bg-input); padding: 4px 10px; border-radius: 100px;
+            font-size: 9.5px; font-weight: bold; color: var(--text-sub); cursor: pointer;
+            transition: all 0.2s; border: none;
+        }
+        .red-btn-small:hover { background: var(--text-main); color: var(--bg-body); }
+
+        /* 文案区 */
+        .red-text-area {
+            background: var(--bg-input); padding: 14px; border-radius: 12px;
+            font-size: 11px; color: var(--text-main); line-height: 1.6;
+            max-height: 150px; overflow-y: auto; text-align: justify;
+            white-space: pre-wrap; word-break: break-all;
+        }
+        .red-text-area::-webkit-scrollbar { display: none; }
+
+        /* 图片网格区 */
+        .img-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .img-card {
+            position: relative; border-radius: 10px; overflow: hidden;
+            aspect-ratio: 3/4; background: var(--bg-input);
+            box-shadow: inset 0 0 0 1px rgba(128,128,128,0.1);
+        }
+        .img-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        
+        .dl-btn {
+            position: absolute; bottom: 8px; right: 8px;
+            width: 28px; height: 28px; border-radius: 8px;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .dl-btn:hover { background: var(--accent-color); transform: scale(1.05); }
+        .dl-icon { width: 14px; height: 14px; stroke: #FFF; stroke-width: 2; fill: none; }
+
+        /* 提示弹窗 */
+        .toast {
+            position: fixed; top: 30px; left: 50%; transform: translateX(-50%) translateY(-10px);
+            background: var(--text-main); color: var(--bg-body);
+            padding: 8px 20px; border-radius: 100px; font-size: 10.5px; font-weight: bold;
+            opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    </style>
+</head>
+<body>
+
+    <div class="red-container">
+        <header class="red-header">
+            <div class="red-theme-btn" id="theme-toggle" title="Switch Theme">
+                <svg class="red-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </div>
+            <h1 class="red-title">笔记暗房</h1>
+            <div class="red-subtitle">RED EXTRACTOR</div>
+        </header>
+
+        <main class="red-body">
+            <div class="red-input-box">
+                <label class="red-label">
+                    笔记分享链接
+                    <span class="red-api-hint">已接入强力去水印API</span>
+                </label>
+                <input type="text" class="red-input" id="url-input" placeholder="请粘贴从小红书复制的分享口令或链接...">
+                <button class="red-submit" id="parse-btn">
+                    <svg class="red-icon" style="stroke:currentColor;" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    提取原画质
+                </button>
+            </div>
+
+            <!-- 解析结果区 -->
+            <div class="red-result" id="result-area">
+                
+                <div>
+                    <div class="section-header">
+                        <span class="red-label">无水印原图</span>
+                    </div>
+                    <div class="img-grid" id="img-grid">
+                        <!-- 图片将渲染在这里 -->
+                    </div>
+                </div>
+
+                <div>
+                    <div class="section-header">
+                        <span class="red-label">笔记文案</span>
+                        <button class="red-btn-small" onclick="copyText()">一键复制</button>
+                    </div>
+                    <div class="red-text-area" id="desc-box"></div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+    
+    <div class="toast" id="toast">解析成功</div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // --- 昼夜切换逻辑 ---
+        const themeBtn = document.getElementById('theme-toggle');
+        const iconMoon = '<svg class="red-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+        const iconSun = '<svg class="red-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+
+        const savedTheme = localStorage.getItem('red-theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            themeBtn.innerHTML = iconSun;
+        }
+
+        themeBtn.addEventListener('click', () => {
+            if (document.documentElement.hasAttribute('data-theme')) {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('red-theme', 'light');
+                themeBtn.innerHTML = iconMoon;
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('red-theme', 'dark');
+                themeBtn.innerHTML = iconSun;
+            }
+        });
+
+        // --- 全局变量与弹窗 ---
+        let currentDesc = "";
+        
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+
+        // --- 核心解析引擎 (接入真正的API) ---
+        const parseBtn = document.getElementById('parse-btn');
+        const urlInput = document.getElementById('url-input');
+        const resultArea = document.getElementById('result-area');
+        const imgGrid = document.getElementById('img-grid');
+        const descBox = document.getElementById('desc-box');
+
+        parseBtn.addEventListener('click', async () => {
+            let rawUrl = urlInput.value.trim();
+            if (!rawUrl) { showToast("主子，您还没贴链接呢"); return; }
+            
+            // 提取文本中的有效 http 链接 (兼容分享口令)
+            const urlMatch = rawUrl.match(/(https?:\/\/[^\s]+)/);
+            if (!urlMatch) { showToast("找不到有效的链接，请检查"); return; }
+            const targetUrl = urlMatch[1];
+
+            parseBtn.disabled = true;
+            parseBtn.innerHTML = '<svg class="red-icon" style="animation: spin 1s linear infinite;" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg> 绕过风控拉取中...';
+            resultArea.classList.remove('show');
+
+            try {
+                // 使用公共稳定的去水印解析 API (Peark API)
+                // 专门负责突破小红书风控获取真实数据
+                const apiUrl = `https://api.pearktrue.cn/api/xiaohongshu?url=${encodeURIComponent(targetUrl)}`;
+                
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error("API 服务器傲娇了");
+                
+                const dataJson = await response.json();
+                
+                if (dataJson.code !== 200 || !dataJson.data) {
+                    throw new Error(dataJson.msg || "解析失败，可能是视频或无权限");
+                }
+
+                const data = dataJson.data;
+
+                // 提取文案
+                const title = data.title || '';
+                const desc = data.desc || '';
+                currentDesc = `${title}\n\n${desc}`.trim();
+                
+                // 提取原图
+                const images = data.images || [];
+                if (images.length === 0) {
+                    throw new Error("没找到图片，难道这是视频笔记？");
+                }
+
+                // 渲染界面
+                descBox.innerText = currentDesc;
+                imgGrid.innerHTML = '';
+                
+                images.forEach((url, idx) => {
+                    const card = document.createElement('div');
+                    card.className = 'img-card';
+                    card.innerHTML = `
+                        <img src="${url}" alt="image-${idx}">
+                        <div class="dl-btn" onclick="openImage('${url}')" title="点击查看原图并长按保存">
+                            <svg class="dl-icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </div>
+                    `;
+                    imgGrid.appendChild(card);
+                });
+
+                resultArea.classList.add('show');
+                showToast("冲洗成功，请享用！");
+
+            } catch (error) {
+                console.error(error);
+                showToast(error.message || "提取失败");
+            } finally {
+                parseBtn.disabled = false;
+                parseBtn.innerHTML = '<svg class="red-icon" style="stroke:currentColor;" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg> 提取原画质';
+            }
+        });
+
+        // --- 功能函数 ---
+        window.copyText = function() {
+            if (!currentDesc) return;
+            navigator.clipboard.writeText(currentDesc).then(() => {
+                showToast('文案已复制');
+            }).catch(() => {
+                showToast('复制失败，请手动选取');
+            });
+        }
+
+        // 因为手机浏览器对强制下载Blob限制很多，最稳妥的方案是新标签页打开让用户长按保存
+        window.openImage = function(url) {
+            window.open(url, '_blank');
+            showToast("已打开原图，请长按或右键保存");
+        }
+    });
+    </script>
+    <style>
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</body>
+</html>
